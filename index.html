@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumShield 2.0 - Sichere Messaging</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #4d81d6;
+      --accent-color: #ff9800;
+      --bg-dark: #121521;
+      --bg-card: #1e2333;
+      --text-light: #ffffff;
+      --text-secondary: #b0b0c0;
+      --success-color: #4caf50;
+      --danger-color: #f44336;
+      --warning-color: #ff9800;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark), #252b42);
+      color: var(--text-light);
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .app-header {
+      text-align: center;
+      padding: 20px 0;
+      background-color: rgba(0, 0, 0, 0.2);
+      position: relative;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 5px;
+    }
+    
+    .logo i {
+      color: var(--accent-color);
+      font-size: 24px;
+    }
+    
+    .app-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0;
+      background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .app-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+    
+    .container {
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background-color: rgba(0, 0, 0, 0.2);
+      border-radius: var(--border-radius);
+      padding: 3px;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      font-weight: 600;
+    }
+    
+    .tab.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .tab i {
+      margin-right: 8px;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .card {
+      background-color: var(--bg-card);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    h2 i {
+      font-size: 1.1rem;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-light);
+      font-size: 16px;
+      transition: var(--transition);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      font-family: inherit;
+    }
+    
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(77, 129, 214, 0.2);
+    }
+    
+    .password-container {
+      position: relative;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      font-size: 16px;
+    }
+    
+    .password-strength {
+      height: 4px;
+      margin-top: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s, background-color 0.3s;
+    }
+    
+    .password-strength-weak {
+      background-color: #f44336;
+    }
+    
+    .password-strength-medium {
+      background-color: #ff9800;
+    }
+    
+    .password-strength-strong {
+      background-color: #4caf50;
+    }
+    
+    .button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .button:hover {
+      background: #3a68b8;
+      transform: translateY(-2px);
+    }
+    
+    .button:active {
+      transform: translateY(0);
+    }
+    
+    .button.success {
+      background: var(--success-color);
+    }
+    
+    .button.success:hover {
+      background: #3d9c40;
+    }
+    
+    .button.warning {
+      background: var(--warning-color);
+    }
+    
+    .button.warning:hover {
+      background: #e68900;
+    }
+    
+    .result {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      word-wrap: break-word;
+      font-family: monospace;
+      font-size: 14px;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .result-container {
+      position: relative;
+      margin-top: 15px;
+    }
+    
+    .copy-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    
+    .copy-indicator.show {
+      opacity: 1;
+      animation: fadeOut 1.5s forwards;
+    }
+    
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .action-buttons .button {
+      margin-bottom: 0;
+    }
+    
+    .features-list {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      padding-left: 20px;
+    }
+    
+    .features-list li {
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 5px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: help;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+      font-weight: normal;
+    }
+    
+    .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+    }
+    
+    .app-footer {
+      text-align: center;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.2);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: auto;
+      padding-bottom: 30px;
+    }
+    
+    .app-footer .card {
+      max-width: 800px;
+      margin: 0 auto 20px auto;
+    }
+    
+    .app-footer p {
+      margin-top: 15px;
+    }
+    
+    .security-badge-container {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .security-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      margin: 0 3px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 152, 0, 0.3);
+      background: rgba(255, 152, 0, 0.1);
+      font-size: 0.8rem;
+    }
+    
+    .security-badge.primary {
+      background: rgba(77, 129, 214, 0.1);
+      border-color: rgba(77, 129, 214, 0.3);
+      color: var(--primary-color);
+    }
+    
+    .security-badge.light {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .settings-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 20px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .settings-icon:hover {
+      color: var(--primary-color);
+      transform: rotate(30deg);
+    }
+    
+    .settings-panel {
+      position: fixed;
+      top: 0;
+      right: -320px;
+      width: 300px;
+      height: 100%;
+      background: var(--bg-card);
+      box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      transition: right 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .settings-panel.active {
+      right: 0;
+    }
+    
+    .settings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .settings-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    
+    .settings-section {
+      margin-bottom: 20px;
+    }
+    
+    .settings-section h3 {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--primary-color);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .setting-label {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+    
+    .range-slider {
+      width: 100%;
+      margin: 10px 0;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      cursor: pointer;
+    }
+    
+    .range-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      cursor: pointer;
+      border: none;
+    }
+    
+    .range-value {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s;
+    }
+    
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .loader {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid var(--primary-color);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .message-box {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      color: white;
+      z-index: 1000;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+    
+    .message-box.show {
+      transform: translateX(0);
+    }
+    
+    .message-box.success {
+      background-color: var(--success-color);
+    }
+    
+    .message-box.error {
+      background-color: var(--danger-color);
+    }
+    
+    .message-box.warning {
+      background-color: var(--warning-color);
+    }
+    
+    /* Responsives Design */
+    @media (max-width: 600px) {
+      .app-title {
+        font-size: 1.5rem;
+      }
+      
+      .container {
+        padding: 15px;
+      }
+      
+      .card {
+        padding: 15px;
+      }
+      
+      .tab {
+        padding: 10px 5px;
+        font-size: 0.9rem;
+      }
+      
+      .tab i {
+        margin-right: 5px;
+      }
+      
+      input[type="text"],
+      input[type="password"],
+      textarea,
+      .button {
+        padding: 12px;
+        font-size: 15px;
+      }
+      
+      .settings-panel {
+        width: 280px;
+      }
+    }
+    
+    /* Für sehr kleine Geräte */
+    @media (max-width: 350px) {
+      .app-title {
+        font-size: 1.3rem;
+      }
+      
+      .tab i {
+        margin-right: 0;
+      }
+      
+      .tab span {
+        display: none;
+      }
+      
+      .tab i {
+        font-size: 1.2rem;
+      }
+    }
+    
+    /* Dunkler Hintergrund für Settings-Panel */
+    .backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    
+    .backdrop.active {
+      display: block;
+    }
+    
+    /* Self-destruct Timer */
+    .timer-container {
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+    
+    .timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--danger-color);
+    }
+    
+    /* QR Code */
+    .qr-container {
+      text-align: center;
+      margin: 15px 0;
+      display: none;
+    }
+    
+    /* Neue Styles */
+    h3 {
+      font-size: 1.1rem;
+      margin: 15px 0 10px;
+      color: var(--text-light);
+    }
+    
+    .info-section {
+      margin-bottom: 20px;
+    }
+    
+    .info-section h2 {
+      margin-top: 0;
+    }
+    
+    .warning-box {
+      background-color: rgba(255, 152, 0, 0.1);
+      border-left: 3px solid var(--accent-color);
+      padding: 10px;
+      margin-top: 5px; 
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .warning-box strong {
+      color: var(--accent-color);
+    }
+    
+    .centered-title {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .centered-text {
+      text-align: center;
+    }
+    
+    .encrypted-text {
+      font-family: monospace;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 5px;
+      position: relative;
+      overflow-wrap: break-word;
+      word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .card.result-card {
+      display: none;
+    }
+    
+    .section-heading {
+      margin-top: 20px;
+    }
+    
+    .range-value-item {
+      display: inline-block;
+    }
+    
+    .setting-description {
+      margin-top: 5px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    .how-to-section h2 {
+      margin-top: 20px;
+    }
+    
+    .info-steps {
+      list-style-type: none;
+      padding-left: 0;
+      counter-reset: step-counter;
+    }
+    
+    .info-steps li {
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 35px;
+    }
+    
+    .info-steps li::before {
+      content: counter(step-counter);
+      counter-increment: step-counter;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 25px;
+      height: 25px;
+      line-height: 25px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 0.8rem;
+    }
+    
+    .with-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .no-transition {
+      transition: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-header">
+    <div class="logo">
+      <i class="fas fa-shield-alt"></i>
+      <h1 class="app-title">QuantumShield 2.0</h1>
+    </div>
+    <p class="app-subtitle">Sichere Ende-zu-Ende-Verschlüsselung für deine Nachrichten</p>
+    <div class="security-badge-container">
+      <span class="security-badge"><i class="fas fa-lock" aria-hidden="true"></i> AES-256</span>
+      <span class="security-badge primary"><i class="fas fa-shield-alt" aria-hidden="true"></i> PBKDF2</span>
+      <span class="security-badge light"><i class="fas fa-desktop" aria-hidden="true"></i> Client-Side</span>
+    </div>
+    <i class="fas fa-cog settings-icon" id="settings-toggle"></i>
+  </div>
+  
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="encrypt">
+        <i class="fas fa-lock"></i><span>Verschlüsseln</span>
+      </div>
+      <div class="tab" data-tab="decrypt">
+        <i class="fas fa-unlock"></i><span>Entschlüsseln</span>
+      </div>
+      <div class="tab" data-tab="info">
+        <i class="fas fa-info-circle"></i><span>Info</span>
+      </div>
+    </div>
+    
+    <div class="tab-content active" id="encrypt-tab">
+      <div class="card">
+        <h2><i class="fas fa-edit"></i> Nachricht erstellen</h2>
+        <div class="input-group">
+          <label for="plainText">Deine Nachricht</label>
+          <textarea id="plainText" placeholder="Gib hier deine geheime Nachricht ein..."></textarea>
+        </div>
+        <div class="input-group">
+          <label for="encryptPass">
+            Passwort 
+            <div class="tooltip">
+              <i class="fas fa-question-circle"></i>
+              <span class="tooltip-text">Wähle ein sicheres Passwort und teile es mit dem Empfänger über einen sicheren Kanal.</span>
+            </div>
+          </label>
+          <div class="password-container">
+            <input type="password" id="encryptPass" placeholder="Sicheres Passwort eingeben" aria-label="Passwort">
+            <button type="button" class="toggle-password" aria-label="Passwort anzeigen/ausblenden">
+              <i class="fas fa-eye-slash" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="password-strength">
+            <div class="password-strength-bar"></div>
+          </div>
+        </div>
+        <button class="button" id="encryptBtn" aria-label="Nachricht verschlüsseln">
+          <i class="fas fa-lock"></i> Nachricht verschlüsseln
+        </button>
+      </div>
+      
+      <div id="result-card" class="card result-card">
+        <h2><i class="fas fa-shield-alt"></i> Verschlüsselte Nachricht</h2>
+        <div class="result-container">
+          <div id="encryptedOutput" class="encrypted-text"></div>
+        </div>
+        <div class="action-buttons">
+          <button id="shareWhatsApp" class="button warning" aria-label="Via WhatsApp teilen">
+            <i class="fab fa-whatsapp"></i> Via WhatsApp teilen
+          </button>
+          <button id="share-url" class="button" aria-label="Als URL teilen">
+            <i class="fas fa-share-alt"></i> Als URL teilen
+          </button>
+        </div>
+        <div class="qr-container" id="qr-code-container"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="decrypt-tab">
+      <div class="card">
+        <h2><i class="fas fa-unlock-alt"></i> Nachricht entschlüsseln</h2>
+        <div class="input-group">
+          <label for="encryptedInput">Verschlüsselte Nachricht</label>
+          <textarea id="encryptedInput" placeholder='Füge hier die verschlüsselte JSON-Nachricht ein ({"salt":"...", "iv":"...", "ciphertext":"..."}).'></textarea>
+        </div>
+        <div class="input-group">
+          <label for="decryptPass">Passwort</label>
+          <div class="password-container">
+            <input type="password" id="decryptPass" placeholder="Passwort eingeben" aria-label="Passwort">
+            <button type="button" class="toggle-password" aria-label="Passwort anzeigen/ausblenden">
+              <i class="fas fa-eye-slash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <button class="button" id="decryptBtn" aria-label="Nachricht entschlüsseln">
+          <i class="fas fa-unlock"></i> Nachricht entschlüsseln
+        </button>
+      </div>
+      
+      <div id="decrypted-result-card" class="card result-card">
+        <h2><i class="fas fa-envelope-open-text"></i> Entschlüsselte Nachricht</h2>
+        <div class="result-container">
+          <div id="decryptedOutput" class="encrypted-text"></div>
+        </div>
+        <button id="decryptCopyButton" class="button success" aria-label="Kopieren">
+          <i class="fas fa-copy"></i> Kopieren
+        </button>
+        <div id="timer-container" class="timer-container">
+          <div id="timer" class="timer"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="info-tab">
+      <div class="card">
+        <h2 class="section-heading"><i class="fas fa-shield-alt"></i> Über QuantumShield <span class="security-badge"><i class="fas fa-lock"></i> Sicher</span></h2>
+        <p>QuantumShield ist eine moderne, sichere Messaging-Lösung, die Ende-zu-Ende-Verschlüsselung für deine privaten Nachrichten bietet.</p>
+        
+        <p>Unsere Verschlüsselung erfolgt vollständig in deinem Browser - deine Daten und Passwörter verlassen niemals dein Gerät. Das heißt, selbst wir können deine Nachrichten nicht lesen!</p>
+        
+        <h3 class="section-heading"><i class="fas fa-star"></i> Funktionen</h3>
+        <ul>
+          <li>Ende-zu-Ende-Verschlüsselung mittels AES-GCM</li>
+          <li>Starke Schlüsselableitung mittels PBKDF2</li>
+          <li>Selbstzerstörende Nachrichten</li>
+          <li>Teilen über WhatsApp und andere Apps</li>
+          <li>QR-Code Generation</li>
+          <li>Offlinefähig (PWA-Support)</li>
+        </ul>
+        
+        <h2 class="section-heading"><i class="fas fa-key"></i> Sicherheitsmerkmale</h2>
+        <ul class="features-list">
+          <li><strong>AES-GCM Verschlüsselung</strong> - Militärischer Verschlüsselungsstandard für maximale Sicherheit</li>
+          <li><strong>PBKDF2 Schlüsselableitung</strong> - Schützt vor Brute-Force-Angriffen</li>
+          <li><strong>Zufälliger Salt & IV</strong> - Garantiert einzigartige Verschlüsselung bei jedem Vorgang</li>
+          <li><strong>Zero-Knowledge</strong> - Alle Berechnungen finden nur auf deinem Gerät statt</li>
+          <li><strong>Keine Server-Speicherung</strong> - Deine Daten werden nirgendwo gespeichert</li>
+          <li><strong>Open Source</strong> - Der Code ist transparent und kann überprüft werden</li>
+        </ul>
+        
+        <h2 class="section-heading"><i class="fas fa-code"></i> Technische Details</h2>
+        <ul class="features-list">
+          <li><strong>Verschlüsselung:</strong> AES-GCM (Advanced Encryption Standard in Galois/Counter Mode)</li>
+          <li><strong>Schlüsselableitung:</strong> PBKDF2 mit SHA-256 und bis zu 500.000 Iterationen</li>
+          <li><strong>Salt-Größe:</strong> 16 Bytes (128 Bits)</li>
+          <li><strong>IV-Größe:</strong> 12 Bytes (96 Bits)</li>
+          <li><strong>Schlüsselgröße:</strong> 256 Bits (optional 128 Bits)</li>
+          <li><strong>JSON-Format:</strong> Struktur mit Base64-kodierten Salt, IV und Ciphertext</li>
+          <li><strong>Kompatibilität:</strong> Alle modernen Browser mit Web Crypto API</li>
+        </ul>
+        
+        <h2 class="section-heading"><i class="fas fa-exclamation-triangle"></i> Wichtige Hinweise</h2>
+        <ul class="features-list">
+          <li>Teile das Passwort <strong>niemals</strong> über denselben Kanal wie die verschlüsselte Nachricht.</li>
+          <li>Verwende ein starkes, einzigartiges Passwort für maximale Sicherheit.</li>
+          <li>Diese App funktioniert vollständig offline und benötigt keine Internetverbindung.</li>
+        </ul>
+        
+        <div class="info-section">
+          <h2 class="section-heading"><i class="fas fa-question-circle" aria-hidden="true"></i> Wie benutze ich QuantumShield?</h2>
+          <ol class="info-steps">
+            <li>
+              <strong>Verschlüsseln:</strong> Wähle den Verschlüsseln-Tab, gib deine Nachricht ein und wähle ein starkes Passwort.
+            </li>
+            <li>
+              <strong>Teilen:</strong> Kopiere die verschlüsselte Nachricht oder nutze die Teilen-Optionen.
+            </li>
+            <li>
+              <strong>Entschlüsseln:</strong> Gib im Entschlüsseln-Tab die verschlüsselte Nachricht und das Passwort ein.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-header">
+      <h2><i class="fas fa-cog"></i> Einstellungen</h2>
+      <button class="settings-close" id="settings-close">&times;</button>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Sicherheit</h3>
+      <div class="setting-item">
+        <span class="setting-label">PBKDF2 Iterationen</span>
+        <div class="setting-control">
+          <input type="range" class="range-slider" id="iterations-slider" min="10000" max="500000" step="10000" value="100000" aria-label="Iterationen für PBKDF2">
+          <div class="range-value">
+            <span class="range-value-item">10.000</span>
+            <span class="range-value-item" id="iterations-value">100.000</span>
+            <span class="range-value-item">500.000</span>
+          </div>
+        </div>
+      </div>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          AES-256 statt AES-128 nutzen
+          <input type="checkbox" id="aes-256-switch" checked aria-label="AES-256 statt AES-128 nutzen">
+          <span class="checkbox-checkmark"></span>
+        </label>
+        <p class="setting-description">Stärkere Verschlüsselung, aber langsamer.</p>
+      </div>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          QR-Code generieren
+          <input type="checkbox" id="qr-code-switch" checked aria-label="QR-Code generieren">
+          <span class="checkbox-checkmark"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          Animationen aktivieren
+          <input type="checkbox" id="animations-switch" checked aria-label="Animationen aktivieren">
+          <span class="checkbox-checkmark"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          Self-Destruct aktivieren
+          <input type="checkbox" id="self-destruct-switch" checked aria-label="Self-Destruct aktivieren">
+          <span class="checkbox-checkmark"></span>
+        </label>
+        <div class="input-group self-destruct-options">
+          <label for="destruct-count">Maximale Anzahl Entschlüsselungen:</label>
+          <input type="number" id="destruct-count" min="1" max="10" value="1" aria-label="Maximale Anzahl Entschlüsselungen">
+        </div>
+      </div>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Erscheinungsbild</h3>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          Dunkler Modus (Kommt bald)
+          <input type="checkbox" id="dark-mode-switch" disabled aria-label="Dunkler Modus">
+          <span class="checkbox-checkmark"></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="settings-section">
+      <h3>Extras</h3>
+      <div class="setting-item">
+        <label class="checkbox-container">
+          QR-Code erstellen
+          <input type="checkbox" id="qr-code-extras-switch" aria-label="QR-Code erstellen">
+          <span class="checkbox-checkmark"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <div class="backdrop" id="backdrop"></div>
+  
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loader"></div>
+  </div>
+  
+  <div class="message-box" id="message-box"></div>
+  
+  <div class="app-footer">
+    <div class="card" style="margin-bottom: 20px;">
+      <h2><i class="fas fa-question-circle"></i> So funktioniert's</h2>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; margin: 15px 0;">
+        <div style="flex: 1; min-width: 250px; margin-bottom: 15px; padding-right: 15px;">
+          <h3 style="font-size: 0.95rem; color: var(--accent-color); margin-bottom: 10px;">Verschlüsselung</h3>
+          <ol style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 20px;">
+            <li>Gib deine Nachricht und ein sicheres Passwort ein</li>
+            <li>Die App generiert Salt und IV zufällig</li>
+            <li>Ein AES-Schlüssel wird aus deinem Passwort abgeleitet</li>
+            <li>Deine Nachricht wird mit AES-GCM verschlüsselt</li>
+            <li>Kopiere das Ergebnis oder teile es via WhatsApp</li>
+          </ol>
+        </div>
+        <div style="flex: 1; min-width: 250px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 15px;">
+          <h3 style="font-size: 0.95rem; color: var(--accent-color); margin-bottom: 10px;">Entschlüsselung</h3>
+          <ol style="color: var(--text-secondary); font-size: 0.9rem; padding-left: 20px;">
+            <li>Füge die verschlüsselte JSON-Nachricht ein</li>
+            <li>Gib das vereinbarte Passwort ein</li>
+            <li>Der gleiche Schlüssel wird aus Passwort und Salt abgeleitet</li>
+            <li>Die Nachricht wird entschlüsselt</li>
+            <li>Der ursprüngliche Text wird angezeigt</li>
+          </ol>
+        </div>
+      </div>
+      <div class="warning-box">
+        <strong>Wichtig:</strong> Teile das Passwort <strong>niemals</strong> über denselben Kanal wie die verschlüsselte Nachricht.
+      </div>
+    </div>
+    <p>QuantumShield 2.0 &copy; 2025 | Entwickelt von Belkis Aslani | Alle Verschlüsselung läuft lokal auf deinem Gerät</p>
+  </div>
+  
+  <script>
+    // DOM-Elemente
+    const tabButtons = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const settingsToggle = document.getElementById('settings-toggle');
+    const settingsPanel = document.getElementById('settings-panel');
+    const settingsClose = document.querySelector('.settings-close');
+    const messageBox = document.getElementById('message-box');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const encryptBtn = document.getElementById('encryptBtn');
+    const decryptBtn = document.getElementById('decryptBtn');
+    const shareWhatsAppBtn = document.getElementById('shareWhatsApp');
+    const qrCodeContainer = document.getElementById('qr-code-container');
+    
+    // DOM-Elemente für Sicherheitseinstellungen
+    const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+    const passwordInput = document.getElementById('encryptPass');
+    const passwordStrengthBar = document.querySelector('.password-strength-bar');
+    const iterationsSlider = document.getElementById('iterations-slider');
+    const iterationsValue = document.getElementById('iterations-value');
+    const qrCodeSwitch = document.getElementById('qr-code-switch');
+    const qrCodeExtrasSwitch = document.getElementById('qr-code-extras-switch');
+    const aes256Switch = document.getElementById('aes-256-switch');
+    const animationsSwitch = document.getElementById('animations-switch');
+    const selfDestructSwitch = document.getElementById('self-destruct-switch');
+    const destructCountInput = document.getElementById('destruct-count');
+    const selfDestructOptions = document.querySelector('.self-destruct-options');
+    const timerContainer = document.getElementById('timer-container');
+    const timerElement = document.getElementById('timer');
+    
+    // Standardeinstellungen für die Verschlüsselung
+    let securitySettings = {
+      iterations: 100000,
+      enableAES256: true,
+      enableSelfDestruct: true,
+      destructCount: 1,
+      enableQRCode: true,
+      enableAnimations: true
+    };
+    
+    // Initial hide/show logic für Self-Destruct Optionen
+    if (selfDestructSwitch) {
+      selfDestructOptions.style.display = selfDestructSwitch.checked ? 'block' : 'none';
+    }
+    
+    // Iterations Slider
+    if (iterationsSlider) {
+      iterationsSlider.addEventListener('input', function() {
+        const value = parseInt(this.value);
+        if (iterationsValue) {
+          iterationsValue.textContent = value.toLocaleString();
+        }
+        securitySettings.iterations = value;
+      });
+    }
+    
+    // QR-Code Toggle (für beide Switches)
+    if (qrCodeSwitch) {
+      qrCodeSwitch.addEventListener('change', function() {
+        securitySettings.enableQRCode = this.checked;
+        // Synchronisiere mit dem anderen Switch
+        if (qrCodeExtrasSwitch) {
+          qrCodeExtrasSwitch.checked = this.checked;
+        }
+      });
+    }
+    
+    if (qrCodeExtrasSwitch) {
+      qrCodeExtrasSwitch.addEventListener('change', function() {
+        securitySettings.enableQRCode = this.checked;
+        // Synchronisiere mit dem anderen Switch
+        if (qrCodeSwitch) {
+          qrCodeSwitch.checked = this.checked;
+        }
+      });
+    }
+    
+    // AES-256 Toggle
+    if (aes256Switch) {
+      aes256Switch.addEventListener('change', function() {
+        securitySettings.enableAES256 = this.checked;
+      });
+    }
+    
+    // Animationen Toggle
+    if (animationsSwitch) {
+      animationsSwitch.addEventListener('change', function() {
+        securitySettings.enableAnimations = this.checked;
+        if (this.checked) {
+          document.body.classList.remove('no-transition');
+        } else {
+          document.body.classList.add('no-transition');
+        }
+      });
+    }
+    
+    // Self-Destruct Toggle
+    if (selfDestructSwitch) {
+      selfDestructSwitch.addEventListener('change', function() {
+        securitySettings.enableSelfDestruct = this.checked;
+        selfDestructOptions.style.display = this.checked ? 'block' : 'none';
+      });
+    }
+    
+    if (destructCountInput) {
+      destructCountInput.addEventListener('change', function() {
+        securitySettings.destructCount = parseInt(this.value) || 1;
+      });
+    }
+    
+    // Hilfsfunktionen: ArrayBuffer <-> Base64
+    function arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return window.btoa(binary);
+    }
+    
+    function base64ToArrayBuffer(base64) {
+      const binary_string = window.atob(base64);
+      const len = binary_string.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+    
+    // Ableitung eines AES-Schlüssels aus dem Passwort mittels PBKDF2
+    async function deriveKey(password, salt) {
+      showLoading(true);
+      try {
+        const enc = new TextEncoder();
+        const keyMaterial = await window.crypto.subtle.importKey(
+          'raw',
+          enc.encode(password),
+          { name: 'PBKDF2' },
+          false,
+          ['deriveKey']
+        );
+        return window.crypto.subtle.deriveKey(
+          {
+            name: 'PBKDF2',
+            salt: salt,
+            iterations: securitySettings.iterations,
+            hash: 'SHA-256'
+          },
+          keyMaterial,
+          { name: 'AES-GCM', length: securitySettings.enableAES256 ? 256 : 128 },
+          false,
+          ['encrypt', 'decrypt']
+        );
+      } finally {
+        showLoading(false);
+      }
+    }
+    
+    // Verschlüsseln der Nachricht
+    async function encryptMessage() {
+      const plainText = document.getElementById('plainText').value;
+      const password = document.getElementById('encryptPass').value;
+      
+      if (!plainText) {
+        showMessage('Bitte gib eine Nachricht ein!', 'error');
+        return;
+      }
+      
+      if (!password) {
+        showMessage('Bitte gib ein Passwort ein!', 'error');
+        return;
+      }
+      
+      showLoading(true);
+      
+      try {
+        const enc = new TextEncoder();
+        const data = enc.encode(plainText);
+        
+        // Zufälliger Salt und IV
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        
+        const key = await deriveKey(password, salt);
+        
+        const ciphertext = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: iv },
+          key,
+          data
+        );
+        
+        // Erstellen eines JSON-Objekts mit Base64-kodierten Werten
+        const output = {
+          salt: arrayBufferToBase64(salt),
+          iv: arrayBufferToBase64(iv),
+          ciphertext: arrayBufferToBase64(ciphertext),
+          v: 2 // Version
+        };
+        
+        // Self-Destruct Informationen hinzufügen, wenn aktiviert
+        if (securitySettings.enableSelfDestruct) {
+          output.sd = true; // Self-destruct flag
+          output.count = securitySettings.destructCount; // Anzahl erlaubter Entschlüsselungsvorgänge
+        }
+        
+        const outputStr = JSON.stringify(output);
+        
+        // Anzeigen des Ergebnisses
+        document.getElementById('encryptedOutput').textContent = outputStr;
+        document.getElementById('encryptedOutput').style.display = 'block';
+        document.getElementById('result-card').style.display = 'block';
+        
+        // QR-Code generieren, falls aktiviert
+        if (securitySettings.enableQRCode) {
+          generateQRCode(outputStr);
+          qrCodeContainer.style.display = 'block';
+        } else {
+          qrCodeContainer.style.display = 'none';
+        }
+        
+        showMessage('Nachricht erfolgreich verschlüsselt!', 'success');
+      } catch (e) {
+        console.error("Verschlüsselungsfehler:", e);
+        showMessage('Verschlüsselung fehlgeschlagen: ' + e.message, 'error');
+      } finally {
+        showLoading(false);
+      }
+    }
+    
+    // WhatsApp-Teilen-Funktion
+    function shareViaWhatsApp() {
+      const encryptedText = document.getElementById('encryptedOutput').textContent;
+      if (encryptedText) {
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(encryptedText)}`;
+        window.open(whatsappUrl, '_blank');
+      }
+    }
+    
+    // Teilen über andere Apps oder direkt als URL
+    function shareAsUrl() {
+      const encryptedText = document.getElementById('encryptedOutput').textContent;
+      if (encryptedText) {
+        const shareUrl = `${window.location.origin}${window.location.pathname}?msg=${encodeURIComponent(encryptedText)}`;
+        
+        // Prüfen ob Web Share API unterstützt wird
+        if (navigator.share) {
+          navigator.share({
+            title: 'QuantumShield Nachricht',
+            text: 'Verschlüsselte Nachricht via QuantumShield',
+            url: shareUrl
+          }).catch(err => {
+            navigator.clipboard.writeText(shareUrl);
+            showMessage('Link wurde in die Zwischenablage kopiert!', 'success');
+          });
+        } else {
+          navigator.clipboard.writeText(shareUrl);
+          showMessage('Link wurde in die Zwischenablage kopiert!', 'success');
+        }
+      }
+    }
+    
+    // Entschlüsseln der Nachricht
+    async function decryptMessage() {
+      const encryptedInput = document.getElementById('encryptedInput').value;
+      const password = document.getElementById('decryptPass').value;
+      
+      if (!encryptedInput) {
+        showMessage('Bitte füge eine verschlüsselte Nachricht ein!', 'error');
+        return;
+      }
+      
+      if (!password) {
+        showMessage('Bitte gib das Passwort ein!', 'error');
+        return;
+      }
+      
+      showLoading(true);
+      
+      try {
+        const inputObj = JSON.parse(encryptedInput);
+        const salt = base64ToArrayBuffer(inputObj.salt);
+        const iv = base64ToArrayBuffer(inputObj.iv);
+        const ciphertext = base64ToArrayBuffer(inputObj.ciphertext);
+        
+        // Self-Destruct Check
+        if (inputObj.sd && (inputObj.count !== undefined)) {
+          if (inputObj.count <= 0) {
+            showMessage('Diese Nachricht hat sich selbst zerstört und kann nicht mehr entschlüsselt werden.', 'error');
+            return;
+          }
+          
+          // Counter reduzieren
+          inputObj.count -= 1;
+          document.getElementById('encryptedInput').value = JSON.stringify(inputObj);
+          
+          // Timer anzeigen, wenn dies die letzte Entschlüsselung ist
+          if (inputObj.count === 0) {
+            timerContainer.style.display = 'block';
+            let seconds = 60;
+            timerElement.textContent = seconds;
+            
+            const countdownInterval = setInterval(() => {
+              seconds--;
+              timerElement.textContent = seconds;
+              
+              if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                document.getElementById('decryptedOutput').textContent = '';
+                document.getElementById('decryptedOutput').style.display = 'none';
+                document.getElementById('decrypted-result-card').style.display = 'none';
+                timerContainer.style.display = 'none';
+                showMessage('Die Nachricht wurde endgültig gelöscht.', 'warning');
+              }
+            }, 1000);
+          }
+        }
+        
+        const key = await deriveKey(password, new Uint8Array(salt));
+        
+        try {
+          // Entschlüsselung
+          const decrypted = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: new Uint8Array(iv) },
+            key,
+            ciphertext
+          );
+          
+          const dec = new TextDecoder();
+          const decryptedText = dec.decode(decrypted);
+          
+          document.getElementById('decryptedOutput').textContent = decryptedText;
+          document.getElementById('decryptedOutput').style.display = 'block';
+          document.getElementById('decrypted-result-card').style.display = 'block';
+          
+          showMessage('Nachricht erfolgreich entschlüsselt!', 'success');
+        } catch (e) {
+          console.error("Entschlüsselungsfehler:", e.name, e.message || "Falsches Passwort oder ungültiges Format");
+          showMessage('Entschlüsselung fehlgeschlagen. Wahrscheinlich falsches Passwort.', 'error');
+        }
+      } catch (e) {
+        console.error("Fehler bei der Verarbeitung:", e.name, e.message || "Unbekannter Fehler");
+        showMessage('Ungültiges Format oder Fehler bei der Verarbeitung: ' + (e.message || "Bitte überprüfen Sie das Format"), 'error');
+      } finally {
+        showLoading(false);
+      }
+    }
+    
+    // QR-Code generieren
+    function generateQRCode(text) {
+      try {
+        // Zuerst Container leeren
+        qrCodeContainer.innerHTML = '';
+        
+        // QR-Code generieren mit der QRCode-Bibliothek
+        new QRCode(qrCodeContainer, {
+          text: text,
+          width: 200,
+          height: 200,
+          colorDark: "#ffffff",
+          colorLight: "#1e2333",
+          correctLevel: QRCode.CorrectLevel.L
+        });
+      } catch (e) {
+        console.error("QR-Code Generierung fehlgeschlagen:", e);
+        qrCodeContainer.innerHTML = '<p class="error">QR-Code konnte nicht generiert werden.</p>';
+      }
+    }
+    
+    // Lade-Overlay anzeigen/ausblenden
+    function showLoading(show) {
+      if (show) {
+        loadingOverlay.classList.add('active');
+      } else {
+        loadingOverlay.classList.remove('active');
+      }
+    }
+    
+    // Nachrichtenbox anzeigen
+    function showMessage(message, type = 'info') {
+      messageBox.textContent = message;
+      messageBox.className = 'message-box';
+      messageBox.classList.add(type);
+      messageBox.classList.add('show');
+      
+      setTimeout(() => {
+        messageBox.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Event-Listener
+    if (encryptBtn) {
+        encryptBtn.addEventListener('click', encryptMessage);
+    }
+    
+    if (decryptBtn) {
+        decryptBtn.addEventListener('click', decryptMessage);
+    }
+    
+    if (shareWhatsAppBtn) {
+        shareWhatsAppBtn.addEventListener('click', shareViaWhatsApp);
+    }
+    
+    if (document.getElementById('share-url')) {
+        document.getElementById('share-url').addEventListener('click', shareAsUrl);
+    }
+    
+    // Password Toggle Buttons
+    togglePasswordBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const passwordField = this.previousElementSibling;
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            const icon = this.querySelector('i');
+            if (type === 'password') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+    
+    if (document.getElementById('decryptCopyButton')) {
+        document.getElementById('decryptCopyButton').addEventListener('click', function() {
+            const outputElem = document.getElementById('decryptedOutput');
+            navigator.clipboard.writeText(outputElem.textContent)
+                .then(() => showMessage('Entschlüsselte Nachricht kopiert!', 'success'))
+                .catch(err => showMessage('Kopieren fehlgeschlagen: ' + err, 'error'));
+        });
+    }
+    
+    // Mobile Optimierung: Tastatur ausblenden nach Eingabe
+    const textInputs = document.querySelectorAll('input, textarea');
+    textInputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        // Timeout, damit die Tastatur Zeit hat, sich zu schließen
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
+      });
+    });
+    
+    // Automatische Erkennung von verschlüsselten Nachrichten
+    const encryptedInputField = document.getElementById('encryptedInput');
+    if (encryptedInputField) {
+      encryptedInputField.addEventListener('paste', function() {
+        setTimeout(() => {
+          try {
+            const text = this.value;
+            if (text.trim().startsWith('{') && text.trim().endsWith('}')) {
+              const obj = JSON.parse(text);
+              if (obj.salt && obj.iv && obj.ciphertext) {
+                showMessage('Verschlüsselte Nachricht erkannt!', 'info');
+              }
+            }
+          } catch (e) {
+            // Keine gültige JSON-Nachricht, nichts tun
+          }
+        }, 100);
+      });
+    }
+    
+    // URL-Parameter prüfen beim Laden der Seite
+    window.addEventListener('DOMContentLoaded', () => {
+      checkUrlForEncryptedMessage();
+    });
+    
+    // Funktion zum Prüfen der URL auf verschlüsselte Nachricht
+    function checkUrlForEncryptedMessage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const encryptedMsg = urlParams.get('msg');
+      
+      if (encryptedMsg) {
+        try {
+          // URL-Parameter entfernen ohne Seite neu zu laden
+          const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+          window.history.replaceState({path: newUrl}, '', newUrl);
+          
+          // Zur Entschlüsselungs-Tab wechseln und Nachricht einfügen
+          switchTab(document.querySelector('.tab[data-tab="decrypt"]'));
+          document.getElementById('encryptedInput').value = decodeURIComponent(encryptedMsg);
+          showMessage('Verschlüsselte Nachricht aus URL geladen', 'info');
+        } catch (e) {
+          console.error('Fehler beim Verarbeiten der URL-Parameter', e);
+        }
+      }
+    }
+    
+    // Tab-Wechsel
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+        
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        button.classList.add('active');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+    
+    // Settings-Panel Toggle
+    settingsToggle.addEventListener('click', () => {
+      settingsPanel.classList.add('active');
+      backdrop.classList.add('active');
+    });
+    
+    settingsClose.addEventListener('click', () => {
+      settingsPanel.classList.remove('active');
+      backdrop.classList.remove('active');
+    });
+    
+    backdrop.addEventListener('click', () => {
+      settingsPanel.classList.remove('active');
+      backdrop.classList.remove('active');
+    });
+    
+    // Passwort anzeigen/verbergen
+    togglePasswordBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const passwordField = this.previousElementSibling;
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+        
+        const icon = this.querySelector('i');
+        if (type === 'password') {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    });
+    
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 20;
+            if (password.match(/[a-z]+/)) strength += 20;
+            if (password.match(/[A-Z]+/)) strength += 20;
+            if (password.match(/[0-9]+/)) strength += 20;
+            if (password.match(/[^A-Za-z0-9]+/)) strength += 20;
+            
+            passwordStrengthBar.style.width = strength + '%';
+            
+            // Entferne alle Klassen
+            passwordStrengthBar.classList.remove('password-strength-weak', 'password-strength-medium', 'password-strength-strong');
+            
+            // Füge die passende Klasse hinzu
+            if (strength <= 20) {
+              passwordStrengthBar.classList.add('password-strength-weak');
+            } else if (strength <= 60) {
+              passwordStrengthBar.classList.add('password-strength-medium');
+            } else {
+              passwordStrengthBar.classList.add('password-strength-strong');
+            }
+        });
+    }
+  </script>
+</body>
+</html>
